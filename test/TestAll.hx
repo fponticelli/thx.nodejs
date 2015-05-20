@@ -1,5 +1,6 @@
 import utest.*;
 import utest.ui.Report;
+using thx.nodejs.io.Buffers;
 
 class TestAll {
   static function main() {
@@ -26,5 +27,12 @@ class TestAll {
     Assert.same("l".charCodeAt(0), input.readByte());
     Assert.same("e".charCodeAt(0), input.readByte());
     Assert.raises(function() input.readByte(), haxe.io.Eof);
+  }
+
+  public function testBufferToBytes() {
+    var buffer = new js.node.Buffer("sample"),
+        bytes  = buffer.toBytes();
+    Assert.same(buffer.length, bytes.length);
+    Assert.same(buffer.toString(), bytes.toString());
   }
 }

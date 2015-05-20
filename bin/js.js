@@ -239,15 +239,21 @@ TestAll.prototype = {
 	testBufferInput: function() {
 		var buffer = new js_node_buffer_Buffer("sample");
 		var input = new thx_nodejs_io_BufferInput(buffer);
-		utest_Assert.same(HxOverrides.cca("s",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 22, className : "TestAll", methodName : "testBufferInput"});
-		utest_Assert.same(HxOverrides.cca("a",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 23, className : "TestAll", methodName : "testBufferInput"});
-		utest_Assert.same(HxOverrides.cca("m",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 24, className : "TestAll", methodName : "testBufferInput"});
-		utest_Assert.same(HxOverrides.cca("p",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 25, className : "TestAll", methodName : "testBufferInput"});
-		utest_Assert.same(HxOverrides.cca("l",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 26, className : "TestAll", methodName : "testBufferInput"});
-		utest_Assert.same(HxOverrides.cca("e",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 27, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("s",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 23, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("a",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 24, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("m",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 25, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("p",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 26, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("l",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 27, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("e",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 28, className : "TestAll", methodName : "testBufferInput"});
 		utest_Assert.raises(function() {
 			input.readByte();
-		},haxe_io_Eof,null,null,{ fileName : "TestAll.hx", lineNumber : 28, className : "TestAll", methodName : "testBufferInput"});
+		},haxe_io_Eof,null,null,{ fileName : "TestAll.hx", lineNumber : 29, className : "TestAll", methodName : "testBufferInput"});
+	}
+	,testBufferToBytes: function() {
+		var buffer = new js_node_buffer_Buffer("sample");
+		var bytes = thx_nodejs_io_Buffers.toBytes(buffer);
+		utest_Assert.same(buffer.length,bytes.length,null,null,{ fileName : "TestAll.hx", lineNumber : 35, className : "TestAll", methodName : "testBufferToBytes"});
+		utest_Assert.same(buffer.toString(),bytes.toString(),null,null,{ fileName : "TestAll.hx", lineNumber : 36, className : "TestAll", methodName : "testBufferToBytes"});
 	}
 	,__class__: TestAll
 };
@@ -544,11 +550,50 @@ haxe_ds_StringMap.prototype = {
 	}
 	,__class__: haxe_ds_StringMap
 };
-var haxe_io_Bytes = function() { };
+var haxe_io_Bytes = function(data) {
+	this.length = data.byteLength;
+	this.b = new Uint8Array(data);
+	this.b.bufferValue = data;
+	data.hxBytes = this;
+	data.bytes = this.b;
+};
 haxe_io_Bytes.__name__ = ["haxe","io","Bytes"];
+haxe_io_Bytes.ofData = function(b) {
+	var hb = b.hxBytes;
+	if(hb != null) return hb;
+	return new haxe_io_Bytes(b);
+};
 haxe_io_Bytes.prototype = {
 	length: null
 	,b: null
+	,getString: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		var s = "";
+		var b = this.b;
+		var fcc = String.fromCharCode;
+		var i = pos;
+		var max = pos + len;
+		while(i < max) {
+			var c = b[i++];
+			if(c < 128) {
+				if(c == 0) break;
+				s += fcc(c);
+			} else if(c < 224) s += fcc((c & 63) << 6 | b[i++] & 127); else if(c < 240) {
+				var c2 = b[i++];
+				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
+			} else {
+				var c21 = b[i++];
+				var c3 = b[i++];
+				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				s += fcc((u >> 10) + 55232);
+				s += fcc(u & 1023 | 56320);
+			}
+		}
+		return s;
+	}
+	,toString: function() {
+		return this.getString(0,this.length);
+	}
 	,__class__: haxe_io_Bytes
 };
 var haxe_io_Eof = function() {
@@ -992,6 +1037,24 @@ thx_nodejs_io_BufferInput.prototype = $extend(haxe_io_Input.prototype,{
 	}
 	,__class__: thx_nodejs_io_BufferInput
 });
+var thx_nodejs_io_Buffers = function() { };
+thx_nodejs_io_Buffers.__name__ = ["thx","nodejs","io","Buffers"];
+thx_nodejs_io_Buffers.toBytes = function(buffer) {
+	return haxe_io_Bytes.ofData(thx_nodejs_io_Buffers.toArrayBuffer(buffer));
+};
+thx_nodejs_io_Buffers.toArrayBuffer = function(buffer) {
+	var arrayBuffer = new ArrayBuffer(buffer.length);
+	var b = new Uint8Array(arrayBuffer);
+	if('undefined' != typeof smalloc) smalloc.copyOnto(buffer,0,b,0,buffer.length); else {
+		var _g1 = 0;
+		var _g = buffer.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			b[i] = buffer[i];
+		}
+	}
+	return arrayBuffer;
+};
 var utest_Assert = function() { };
 utest_Assert.__name__ = ["utest","Assert"];
 utest_Assert.isTrue = function(cond,msg,pos) {
