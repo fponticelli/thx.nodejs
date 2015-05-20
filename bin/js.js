@@ -238,7 +238,7 @@ TestAll.main = function() {
 TestAll.prototype = {
 	testBufferInput: function() {
 		var buffer = new js_node_buffer_Buffer("sample");
-		var input = new thx_nodejs_stream_BufferInput(buffer);
+		var input = new thx_nodejs_io_BufferInput(buffer);
 		utest_Assert.same(HxOverrides.cca("s",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 22, className : "TestAll", methodName : "testBufferInput"});
 		utest_Assert.same(HxOverrides.cca("a",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 23, className : "TestAll", methodName : "testBufferInput"});
 		utest_Assert.same(HxOverrides.cca("m",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 24, className : "TestAll", methodName : "testBufferInput"});
@@ -974,13 +974,13 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	return a;
 };
 var js_node_buffer_Buffer = require("buffer").Buffer;
-var thx_nodejs_stream_BufferInput = function(buffer) {
+var thx_nodejs_io_BufferInput = function(buffer) {
 	this.buffer = buffer;
 	this.reset();
 };
-thx_nodejs_stream_BufferInput.__name__ = ["thx","nodejs","stream","BufferInput"];
-thx_nodejs_stream_BufferInput.__super__ = haxe_io_Input;
-thx_nodejs_stream_BufferInput.prototype = $extend(haxe_io_Input.prototype,{
+thx_nodejs_io_BufferInput.__name__ = ["thx","nodejs","io","BufferInput"];
+thx_nodejs_io_BufferInput.__super__ = haxe_io_Input;
+thx_nodejs_io_BufferInput.prototype = $extend(haxe_io_Input.prototype,{
 	buffer: null
 	,pos: null
 	,reset: function() {
@@ -990,7 +990,7 @@ thx_nodejs_stream_BufferInput.prototype = $extend(haxe_io_Input.prototype,{
 		if(this.pos >= this.buffer.length) throw new js__$Boot_HaxeError(new haxe_io_Eof());
 		return this.buffer[this.pos++];
 	}
-	,__class__: thx_nodejs_stream_BufferInput
+	,__class__: thx_nodejs_io_BufferInput
 });
 var utest_Assert = function() { };
 utest_Assert.__name__ = ["utest","Assert"];

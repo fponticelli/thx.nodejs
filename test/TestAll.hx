@@ -17,7 +17,7 @@ class TestAll {
 
   public function testBufferInput() {
     var buffer = new js.node.Buffer("sample"),
-        input  = new thx.nodejs.stream.BufferInput(buffer);
+        input  = new thx.nodejs.io.BufferInput(buffer);
 
     Assert.same("s".charCodeAt(0), input.readByte());
     Assert.same("a".charCodeAt(0), input.readByte());

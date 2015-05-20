@@ -1,4 +1,4 @@
-package thx.nodejs.stream;
+package thx.nodejs.io;
 
 import js.node.Buffer;
 

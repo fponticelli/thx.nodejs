@@ -1,0 +1,14 @@
+{
+  "name": "thx.nodejs",
+  "url": "https://github.com/fponticelli/thx.nodejs",
+  "license": "MIT",
+  "classPath": "src",
+  "tags": ["thx", "nodejs"],
+  "description": "Library to better integrate nodejs + thx + haxe.",
+  "releasenote": "First release.",
+  "version": "0.0.1",
+  "contributors": ["fponticelli"],
+  "dependencies": {
+    "thx.core": ""
+  }
+}
