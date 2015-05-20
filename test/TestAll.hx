@@ -15,7 +15,16 @@ class TestAll {
 
   public function new() {}
 
-  public function testBase() {
+  public function testBufferInput() {
+    var buffer = new js.node.Buffer("sample"),
+        input  = new thx.nodejs.stream.BufferInput(buffer);
 
+    Assert.same("s".charCodeAt(0), input.readByte());
+    Assert.same("a".charCodeAt(0), input.readByte());
+    Assert.same("m".charCodeAt(0), input.readByte());
+    Assert.same("p".charCodeAt(0), input.readByte());
+    Assert.same("l".charCodeAt(0), input.readByte());
+    Assert.same("e".charCodeAt(0), input.readByte());
+    Assert.raises(function() input.readByte(), haxe.io.Eof);
   }
 }

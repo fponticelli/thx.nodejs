@@ -236,7 +236,18 @@ TestAll.main = function() {
 	runner.run();
 };
 TestAll.prototype = {
-	testBase: function() {
+	testBufferInput: function() {
+		var buffer = new js_node_buffer_Buffer("sample");
+		var input = new thx_nodejs_stream_BufferInput(buffer);
+		utest_Assert.same(HxOverrides.cca("s",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 22, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("a",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 23, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("m",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 24, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("p",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 25, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("l",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 26, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.same(HxOverrides.cca("e",0),input.readByte(),null,null,{ fileName : "TestAll.hx", lineNumber : 27, className : "TestAll", methodName : "testBufferInput"});
+		utest_Assert.raises(function() {
+			input.readByte();
+		},haxe_io_Eof,null,null,{ fileName : "TestAll.hx", lineNumber : 28, className : "TestAll", methodName : "testBufferInput"});
 	}
 	,__class__: TestAll
 };
@@ -540,6 +551,15 @@ haxe_io_Bytes.prototype = {
 	,b: null
 	,__class__: haxe_io_Bytes
 };
+var haxe_io_Eof = function() {
+};
+haxe_io_Eof.__name__ = ["haxe","io","Eof"];
+haxe_io_Eof.prototype = {
+	toString: function() {
+		return "Eof";
+	}
+	,__class__: haxe_io_Eof
+};
 var haxe_io_Error = { __ename__ : ["haxe","io","Error"], __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
 haxe_io_Error.Blocked = ["Blocked",0];
 haxe_io_Error.Blocked.toString = $estr;
@@ -595,6 +615,8 @@ haxe_io_FPHelper.doubleToI64 = function(v) {
 	}
 	return i64;
 };
+var haxe_io_Input = function() { };
+haxe_io_Input.__name__ = ["haxe","io","Input"];
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
 	this.val = val;
@@ -951,6 +973,25 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	a.byteOffset = start;
 	return a;
 };
+var js_node_buffer_Buffer = require("buffer").Buffer;
+var thx_nodejs_stream_BufferInput = function(buffer) {
+	this.buffer = buffer;
+	this.reset();
+};
+thx_nodejs_stream_BufferInput.__name__ = ["thx","nodejs","stream","BufferInput"];
+thx_nodejs_stream_BufferInput.__super__ = haxe_io_Input;
+thx_nodejs_stream_BufferInput.prototype = $extend(haxe_io_Input.prototype,{
+	buffer: null
+	,pos: null
+	,reset: function() {
+		this.pos = 0;
+	}
+	,readByte: function() {
+		if(this.pos >= this.buffer.length) throw new js__$Boot_HaxeError(new haxe_io_Eof());
+		return this.buffer[this.pos++];
+	}
+	,__class__: thx_nodejs_stream_BufferInput
+});
 var utest_Assert = function() { };
 utest_Assert.__name__ = ["utest","Assert"];
 utest_Assert.isTrue = function(cond,msg,pos) {
