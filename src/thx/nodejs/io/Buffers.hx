@@ -4,7 +4,7 @@ import js.node.Buffer;
 import haxe.io.Bytes;
 
 class Buffers {
-  public static function fromBytes(bytes : Bytes) : Buffer {
+  public static function toBuffer(bytes : Bytes) : Buffer {
     var buffer = new js.node.Buffer(bytes.length);
     for(i in 0...bytes.length)
       buffer[i] = bytes.get(i);
