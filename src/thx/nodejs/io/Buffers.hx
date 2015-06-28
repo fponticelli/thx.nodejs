@@ -4,6 +4,13 @@ import js.node.Buffer;
 import haxe.io.Bytes;
 
 class Buffers {
+  public static function fromBytes(bytes : Bytes) : Buffer {
+    var buffer = new js.node.Buffer(bytes.length);
+    for(i in 0...bytes.length)
+      buffer[i] = bytes.get(i);
+    return buffer;
+  }
+
   public static function toBytes(buffer : Buffer) : Bytes {
     return Bytes.ofData(toArrayBuffer(buffer));
   }
